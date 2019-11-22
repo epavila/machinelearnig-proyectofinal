@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %} {# importacion de macros #}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{# sobre escribe el valor de la plantilla base #}
+{# {% block title %}Hello{% endblock %} #}
+
+{# Para juntarlo o extenderlo hacemos lo siguiente: #}
+{% block title %}
+    {{ super() }}
+    Hello WTF
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        {{ wtf.quick_form(login_form) }}
+    </div>
+
+{% endblock %}

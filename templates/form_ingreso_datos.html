@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %} {# importacion de macros #}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{# sobre escribe el valor de la plantilla base #}
+{# {% block title %}Hello{% endblock %} #}
+
+{# Para juntarlo o extenderlo hacemos lo siguiente: #}
+{% block title %}
+    {{ super() }}
+    Hello WTF
+{% endblock %}
+
+{% block content %}
+    {% if username %}
+        <h1>Bienvendio, {{ username | capitalize }}</h1>
+    {% endif %}
+
+    <div class="container">
+        <div id="contFormulario">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><h4>Cliente</h4></div>
+                <div class="panel-body">{{ wtf.quick_form(modelo_cliente) }}</div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading"><h4>Cr&eacutedito</h4></div>
+                <div class="panel-body">{{ wtf.quick_form(modelo_credito) }}</div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading"><h4>Veh&iacute;culo</h4></div>
+                <div class="panel-body">{{ wtf.quick_form(modelo_vehiculo) }}</div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <input id="btnForm" type="submit" class="btn btn-success" value="Procesar modelo">
+                </div>
+                <div id="contTabla" class="panel-body" style="display: none;">
+                    <table cellspacing="10" border="0">
+                        <tr>
+                            <th>BUEN PAGADOR</th>
+                            <th>&nbsp;&nbsp;|&nbsp;&nbsp;</th>
+                            <th>CERTEZA</th>
+                        </tr>
+                        <tr>
+                            <td><div id="contBuenPagador"></div></td>
+                            <td>&nbsp;&nbsp;<strong>|</strong>&nbsp;&nbsp;</td>
+                            <td><div id="contCerteza"></div></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        $(function () {
+            var provincias = [
+                {data: 1, value: "Azuay"},
+                {data: 2, value: "Bolívar"},
+                {data: 3, value: "Cañar"},
+                {data: 4, value: "Carchi"},
+                {data: 5, value: "Cotopaxi"},
+                {data: 6, value: "Chimborazo"},
+                {data: 7, value: "El oro"}
+
+            ];
+
+            var ciudades = [
+                {data: 1010, value: "Cuenca"},
+                {data: 1020, value: "Giron"},
+                {data: 1030, value: "Gualaceo"},
+                {data: 1040, value: "Nabon"},
+                {data: 17010, value: "Quito"},
+                {data: 9010, value: "Guayaquil"},
+                {data: 18010, value: "Ambato"}
+
+            ];
+
+            /*
+            $("#provincia").autocomplete({
+                source: availableTags,
+                select: function (response) {
+                    //alert('You selected: ' + availableTags.data);
+                    console.log(suggestion.value);
+                }
+            });
+             */
+
+            $("#provincia").autocomplete({
+                source: provincias
+            });
+
+            $("#provincia").change(function () {
+                var existeProvincia = false;
+                for (var clave in provincias) {
+                    if ($("#provincia").val().toLowerCase() == provincias[clave].value.toLowerCase()) {
+                        existeProvincia = true;
+                    }
+                }
+
+                if (!existeProvincia) {
+                    $("#provincia").val(null);
+                }
+            });
+
+
+            $("#ciudad").autocomplete({
+                source: ciudades
+            });
+
+            $("#ciudad").change(function () {
+                var existeCiudad = false;
+                for (var clave in ciudades) {
+                    if ($("#ciudad").val().toLowerCase() == ciudades[clave].value.toLowerCase()) {
+                        existeCiudad = true;
+                    }
+                }
+
+                if (!existeCiudad) {
+                    $("#ciudad").val(null);
+                }
+            });
+
+
+
+            $('#btnForm').click(function(e) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ url_for('procesar_modelo') }}',
+                    dataType: "json",
+                    data: {
+                        success: false,
+                        //Cliente:
+                        genero: $('#{{ modelo_cliente.genero.id }}').val(),
+                        edad: $('#{{ modelo_cliente.edad.id }}').val(),
+                        estado_civil: $('#{{ modelo_cliente.estado_civil.id }}').val(),
+                        nivel_estudios: $('#{{ modelo_cliente.nivel_estudios.id }}').val(),
+                        ingresos: $('#{{ modelo_cliente.ingresos.id }}').val(),
+                        gastos: $('#{{ modelo_cliente.gastos.id }}').val(),
+                        provincia: $('#{{ modelo_cliente.provincia.id }}').val(),
+                        ciudad: $('#{{ modelo_cliente.ciudad.id }}').val(),
+                        tipo_residencia: $('#{{ modelo_cliente.tipo_residencia.id }}').val(),
+
+                        //Credito:
+                        tipo_credito: $('#{{ modelo_credito.tipo_credito.id }}').val(),
+                        porcentaje_entrada: $('#{{ modelo_credito.porcentaje_entrada.id }}').val(),
+                        monto_prestamo: $('#{{ modelo_credito.monto_prestamo.id }}').val(),
+                        numero_cuotas: $('#{{ modelo_credito.numero_cuotas.id }}').val(),
+                        monto_cuota: $('#{{ modelo_credito.monto_cuota.id }}').val(),
+                        plazo_prestamo: $('#{{ modelo_credito.plazo_prestamo.id }}').val(),
+                        tasa_prestamo: $('#{{ modelo_credito.tasa_prestamo.id }}').val(),
+
+                        //Vehiculo
+                        valor_vehiculo: $('#{{ modelo_vehiculo.valor_vehiculo.id }}').val(),
+                        marca_vehiculo: $('#{{ modelo_vehiculo.marca_vehiculo.id }}').val(),
+                        clase_vehiculo: $('#{{ modelo_vehiculo.clase_vehiculo.id }}').val(),
+                        estado_vehiculo: $('#{{ modelo_vehiculo.estado_vehiculo.id }}').val()
+                    },
+
+                    success: function (data) {
+
+                        $('#contTabla').show();
+                        $('#contBuenPagador').html(data.buen_pagador);
+                        $('#contCerteza').html(data.certeza);
+                    }
+                });
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %} {# importacion de macros #}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{# sobre escribe el valor de la plantilla base #}
+{# {% block title %}Hello{% endblock %} #}
+
+{# Para juntarlo o extenderlo hacemos lo siguiente: #}
+{% block title %}
+    {{ super() }}
+    Hello WTF
+{% endblock %}
+
+{% block content %}
+    {% if username %}
+        <h1>Bienvendio, {{ username | capitalize }}</h1>
+    {% endif %}
+
+    {% if user_ip %}
+        <h3>Ip equipo: {{ user_ip }}</h3>
+    {% else %}
+        <a href="{{ url_for('index') }}"> ir a inicio </a>
+    {% endif %}
+
+    {#
+    El siguinete código trabaja con formas sin aprovechar los estilos de Bootstrap
+    <!--
+    <div class="container">
+        <form action="{{ url_for('hello') }}" method="POST"></form>
+        {{ login_form.username }}
+        {{ login_form.username.label }}
+    </div>
+    -->
+    #}
+
+    <div class="container">
+        {{ wtf.quick_form(login_form) }}
+    </div>
+
+    <ul>
+        {% for todo in todos %}
+            {{ macros.render_todo(todo) }}
+        {% endfor %}
+    </ul>
+{% endblock %}
